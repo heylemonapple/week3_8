@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>색 맞추기 게임</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #000000, #434343); /* Black gradient background */
+            color: white; /* White text color */
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        #colorName {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        #timer {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: red;
+        }
+
+        .colorButton {
+            width: 150px;
+            height: 150px;
+            margin: 10px;
+            border: 3px solid white; /* White outline */
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .colorButton:hover {
+            transform: scale(1.1);
+        }
+
+        #score {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        #startButton, #restartButton {
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        #startButton:hover, #restartButton:hover {
+            background-color: #ccc;
+        }
+
+        #restartButton {
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body>
+    <h1>색 맞추기 게임</h1>
+    <div id="colorName">Color Name</div>
+    <div id="timer">Time Left: 10s</div>
+    <div id="buttonsContainer"></div>
+    <div id="score">Score: 0</div>
+    <button id="startButton">시작</button> <!-- Start button -->
+    <button id="restartButton">재시작</button> <!-- Restart button -->
+
+    <script>
+        const colors = [
+            { name: 'Red', value: 'rgb(255, 0, 0)' },
+            { name: 'Green', value: 'rgb(0, 128, 0)' },
+            { name: 'Blue', value: 'rgb(0, 0, 255)' },
+            { name: 'Yellow', value: 'rgb(255, 255, 0)' },
+            { name: 'Purple', value: 'rgb(128, 0, 128)' }
+        ];
+
+        let score = 0;
+        let timeLeft = 10;
+        let timer;
+        const colorNameDisplay = document.getElementById('colorName');
+        const buttonsContainer = document.getElementById('buttonsContainer');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const startButton = document.getElementById('startButton');
+        const restartButton = document.getElementById('restartButton');
+
+        startButton.addEventListener('click', startGame); // Event listener for the Start button
+        restartButton.addEventListener('click', startGame); // Event listener for the Restart button
+
+        function startGame() {
+            resetGame();
+            generateColorName();
+            createButtons();
+            startTimer();
+            startButton.style.display = 'none'; // Hide start button when game starts
+            restartButton.style.display = 'none'; // Hide restart button when game starts
+        }
+
+        function generateColorName() {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            colorNameDisplay.textContent = randomColor.name; // Set the displayed color name
+        }
+
+        function createButtons() {
+            buttonsContainer.innerHTML = ''; // Clear previous buttons
+            const buttonColors = shuffleArray([...colors]); // Shuffle colors for buttons
+            buttonColors.forEach(color => {
+                const button = document.createElement('button');
+                button.className = 'colorButton';
+                button.style.backgroundColor = color.value;
+                button.addEventListener('click', () => checkGuess(color.name));
+                buttonsContainer.appendChild(button);
+            });
+        }
+
+        function checkGuess(selectedColorName) {
+            const displayedColorName = colorNameDisplay.textContent;
+            if (selectedColorName === displayedColorName) {
+                score++;
+                scoreDisplay.textContent = 'Score: ' + score; // Update score display
+            }
+            generateColorName(); // Generate a new color name for the next round
+            createButtons(); // Create new buttons
+        }
+
+        function startTimer() {
+            timer = setInterval(function () {
+                timeLeft--;
+                timerDisplay.textContent = 'Time Left: ' + timeLeft + 's';
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    endGame(); // End the game when time is up
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            alert('Time\'s up! Your final score is: ' + score);
+            restartButton.style.display = 'block'; // Show restart button at the end
+        }
+
+        function resetGame() {
+            score = 0;
+            timeLeft = 10;
+            scoreDisplay.textContent = 'Score: ' + score;
+            timerDisplay.textContent = 'Time Left: ' + timeLeft + 's';
+        }
+
+        // Shuffle function to randomize the button colors
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>
